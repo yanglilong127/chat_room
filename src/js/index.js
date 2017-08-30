@@ -113,6 +113,7 @@ $('#conf').click(function(e){
 					<span class="msg">${msg}</span>
 				</li>`;
 		$('#content ul.mycont').append($($li));
+		slideD();
 	});
 	//接受用户的广播图片消息
 	//参数1 为用户名
@@ -125,11 +126,20 @@ $('#conf').click(function(e){
 					<img src="${addr}" alt="">
 				</li>`;
 		$('#content ul.mycont').append($($li));
+		slideD();
 	});
+
 	
 });
 
-
+//发消息时使到达最底端
+function slideD(){
+	var ulH=$('#content ul.mycont').height();  //内容里面ul高度
+	var contentH=$('#content').height();   //内容高度
+	if(ulH > contentH){
+		$('#content').scrollTop(ulH-contentH);
+	}
+}
 
 
 
