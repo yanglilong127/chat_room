@@ -58,7 +58,8 @@ io.on('connection',(socket)=>{
 
 	//用户发广播消息
 	socket.on('msg',(msg)=>{
-		socket.broadcast.emit('newMsg',socket.nickname,msg);
+		//socket.broadcast.emit('newMsg',socket.nickname,msg);
+		io.sockets.emit('newMsg',socket.nickname,msg);
 	});
 	//用户发广播图片消息
 	socket.on('imgMsg',(addr)=>{

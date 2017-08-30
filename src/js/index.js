@@ -18,6 +18,13 @@ $(document).click(function(){
 	$('#biaoqing ul.emoit').fadeOut();
 });
 
+//当屏幕宽度小于700px时使之全屏
+var winW=$(window).width();
+if(winW<700){
+	var winH=$(window).height();  //窗口高度
+	var contentH=winH-106;  //内容区高度
+	$('#content').height(contentH);
+}
 
 
 //点击确认后
