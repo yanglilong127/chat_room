@@ -25,6 +25,15 @@ if(winW<700){
 	var contentH=winH-106;  //内容区高度
 	$('#content').height(contentH);
 }
+$(window).resize(function(){
+	if($(window).width()<700){
+		var winH=$(window).height();  //窗口高度
+		var contentH=winH-106;  //内容区高度
+		$('#content').height(contentH);
+	}else{
+		$('#content').height(590);
+	}
+});
 
 
 //点击确认后
