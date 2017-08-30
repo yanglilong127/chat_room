@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>welcome chatroom</title>
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/index.css">
+</head>
+<body>	
+	<div id="box">
+		<h2>聊天室
+			<span class="online">
+				<span class="nums">0</span>
+				<span>:在线</span>
+			</span>
+		</h2>
+		<hr>
+
+		<div id="content">
+			<ul class="mycont">
+				<!--
+				<li class='message'>
+					<span class="from_who">long</span>
+					<span class="time">(14:52:07):</span>
+					<span class="msg">阿萨德</span>
+				</li>
+				<li class="mypic">
+					<span class="from_who">long</span>
+					<span class="time">(14:52:07):</span>
+					<img src="images/emoji/1.gif" alt="">
+				</li>
+				-->
+			</ul>
+		</div>
+
+		<hr>
+		<div id="biaoqing">
+			<img src="images/logo.png" alt="" class="logo">
+			<ul class="emoit">
+				<!--
+				<li><img src="images/emoji/1.gif" alt=""></li>
+				-->
+			</ul>
+		</div>
+		<div class="input-group">
+	      <input type="text" class="form-control" placeholder="输入内容" id="myMsg">
+	      <span class="input-group-btn">
+	        <button class="btn btn-primary" type="button" id="send">发送</button>
+	      </span>
+	    </div>
+	</div>
+	
+	<!--遮罩层-->
+	<div id="zhezhao">
+		<div class="juzhong">
+			<div class="input-group">
+		      <input type="text" class="form-control" placeholder="输入名字">
+		      <span class="input-group-btn">
+		        <button class="btn btn-primary" type="button" id="conf">确定</button>
+		      </span>
+		      
+		    </div>
+		    <p id="tips">撒旦撒</p>
+		</div>
+	</div>
+
+<script src="js/socket.io.js"></script>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/index.js"></script>
+</body>
+</html>
