@@ -70,7 +70,7 @@ io.on('connection',(socket)=>{
 	});
 	//用户发广播的本地图片
 	socket.on('mySelfImg',(addr)=>{
-		io.sockets.emit('mySelfImg',addr);
+		socket.broadcast.emit('mySelfImg',addr);
 	});
 	
 });

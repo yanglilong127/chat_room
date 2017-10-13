@@ -115,6 +115,14 @@ $('#conf').click(function(e){
 			}
 			reader.onload=function(e){  //加载完成时触发
 				//this.result为base64编码图片  或者e.target.result
+				var nowTime=forMatDate(new Date());
+				var $li=`<li class="mypic">
+							<span class="from_who">${username}</span>
+							(<span class="time">${nowTime}</span>):
+							<img src="${this.result}" alt="">
+						</li>`;
+				$('#content ul.mycont').append($($li));
+				slideD();
 				socket.emit('mySelfImg',this.result);
 			};
 		});
