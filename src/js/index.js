@@ -8,11 +8,18 @@ for(var i=1;i<=69; i++){
 	}
 }
 
-
 //点击表情
 $('#biaoqing img.logo').click(function(e){
 	e.stopPropagation();
 	$('#biaoqing ul.emoit').slideToggle();
+});
+//点击选择图片
+$('#biaoqing img.mytupian').click(function(e){
+	e.stopPropagation();
+	$('#mytupian').trigger('click');
+});
+$('#mytupian').click(function(e){
+	e.stopPropagation();
 });
 $(document).click(function(){
 	$('#biaoqing ul.emoit').fadeOut();
@@ -74,12 +81,44 @@ $('#conf').click(function(e){
 				alert('输入不能为空');
 			}
 		});
-		//用户可以广播图片了
+		//用户可以广播表情图片了
 		$('#biaoqing ul.emoit li').click(function(e){
 			e.stopPropagation();
 			var msg=$(this).find('img').attr('src');
 			socket.emit('imgMsg',msg);
 		});
+		
+		
+		//用户可以发送本地图片了
+		$('#mytupian').change(function(e){
+			e.stopPropagation();
+			var file=$(this).get(0).files[0];
+			var arr=file.name.split('.');
+			var ext=arr[arr.length-1].toLowerCase();  //后缀名
+			if(ext!='png' && ext!='jpg' && ext!='jpeg' && ext!='gif'){  //如果不是图片
+				alert('只能选择图片文件');
+				return;
+			};
+			var reader=new FileReader();
+			reader.readAsDataURL(file);
+			reader.onloadstart=function(e){   //数据刚开始读取
+				$('#content .progress').text('0%').fadeIn(1);
+			}
+			reader.onprogress=function(e){  //数据读取中触发
+				var loaded=e.loaded/e.total;
+				if(loaded <1){
+					var loadedSize=parseInt(loaded*100)+'%';
+					$('#content .progress').text(loadedSize);
+				}else{
+					$('#content .progress').text('100%').fadeOut();
+				}
+			}
+			reader.onload=function(e){  //加载完成时触发
+				//this.result为base64编码图片  或者e.target.result
+				socket.emit('mySelfImg',this.result);
+			};
+		});
+		
 	});
 
 	//系统广播
@@ -124,6 +163,18 @@ $('#conf').click(function(e){
 					<span class="from_who">${username}</span>
 					(<span class="time">${nowTime}</span>):
 					<img src="${addr}" alt="">
+				</li>`;
+		$('#content ul.mycont').append($($li));
+		slideD();
+	});
+	
+	//用户接受广播的本地图片
+	socket.on('mySelfImg',(msgAddr)=>{
+		var nowTime=forMatDate(new Date());
+		var $li=`<li class="mypic">
+					<span class="from_who">${username}</span>
+					(<span class="time">${nowTime}</span>):
+					<img src="${msgAddr}" alt="">
 				</li>`;
 		$('#content ul.mycont').append($($li));
 		slideD();

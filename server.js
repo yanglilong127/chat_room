@@ -2,14 +2,15 @@ const express=require('express');
 const app=express();
 const server=require('http').createServer(app);
 const io=require('socket.io').listen(server);
+const _=require('underscore');
 
 app.use(express.static('./src'));
 
-server.listen(8082,(err)=>{
+server.listen(8088,(err)=>{
 	if(err)
 		throw err;
 	else{
-		console.log('成功监听8082端口');
+		console.log('成功监听8088端口');
 	}
 });
 
@@ -41,6 +42,7 @@ io.on('connection',(socket)=>{
 		if(checkNickname(username)){  //用户名已存在
 			socket.emit('nickname');
 		}else{
+			//socket.id;   唯一
 			socket.nickname=username;
 			socket.emit('loginSuccess');   //登录成功
 			var nums=io.eio.clientsCount;  //在线人数
@@ -59,11 +61,16 @@ io.on('connection',(socket)=>{
 	//用户发广播消息
 	socket.on('msg',(msg)=>{
 		//socket.broadcast.emit('newMsg',socket.nickname,msg);
+		//私发消息 _.findWhere(io.sockets.sockets,{nickname:'burt'}).emit();
 		io.sockets.emit('newMsg',socket.nickname,msg);
 	});
 	//用户发广播图片消息
 	socket.on('imgMsg',(addr)=>{
 		io.sockets.emit('newImg',socket.nickname,addr);
 	});
-
+	//用户发广播的本地图片
+	socket.on('mySelfImg',(addr)=>{
+		io.sockets.emit('mySelfImg',addr);
+	});
+	
 });

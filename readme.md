@@ -117,3 +117,14 @@ reconnect_failed：重连失败
 reconnect：成功重连
 reconnecting：正在重连
 当第一次连接时，事件触发顺序为：connecting->connect；当失去连接时，事件触发顺序为：disconnect->reconnecting（可能进行多次）->connecting->reconnect->connect。
+
+
+
+
+如何给制定用户发消息
+1.通过找到socket.id就可以了  io.sockets.connected[socketid].emit();
+2. io.to(socketid).emit();
+3.  需要引用underscore库
+	npm install underscore
+	const _=require('underscore');
+	_.findWhere(io.sockets.sockets,{nickname:'burt').emit();
