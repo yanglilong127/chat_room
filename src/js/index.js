@@ -53,7 +53,7 @@ $('#conf').click(function(e){
 
 
 	//建立socket连接
-	var socket =io.connect();
+	var socket =io.connect('localhost:80');
 	socket.on('connect',()=>{
 		socket.emit('login',username);
 	});
