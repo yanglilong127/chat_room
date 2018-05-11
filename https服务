@@ -12,7 +12,7 @@ const httpProxyMiddleware=require('http-proxy-middleware');
 const io=require('socket.io').listen(server2,{pingTimeout:30000});
 //转换http 请求https
 //app.use(enforceHttps.HTTPS({redirectMethods:['GET']}));
-io.attach(server1);  
+//io.attach(server1);  
 const _=require('underscore');
 
 app.use(express.static('./src'));
