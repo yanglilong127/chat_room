@@ -1,0 +1,149 @@
+const fs=require('fs');
+const enforceHttps = require('express-sslify'); //强制使用https
+const express=require('express');
+const app=express();
+const server1=require('http').createServer(app);
+var privateKey  = fs.readFileSync('./2_burtyang.top.key', 'utf8');
+var certificate = fs.readFileSync('./1_burtyang.top_bundle.crt', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+const server2=require('https').createServer(credentials, app);
+const httpProxyMiddleware=require('http-proxy-middleware');
+//创建socket对象 io
+const io=require('socket.io').listen(server2,{pingTimeout:30000});
+//转换http 请求https
+//app.use(enforceHttps.HTTPS({redirectMethods:['GET']}));
+io.attach(server1);  
+const _=require('underscore');
+
+app.use(express.static('./src'));
+
+server1.listen(80,(err)=>{
+	if(err)
+		throw err;
+	else{
+		console.log('成功监听80端口');
+	}
+});
+
+
+server2.listen(443,(err)=>{
+	if(err)
+		throw err;
+	else{
+		console.log('成功监听443端口');
+	}
+});
+
+
+const proxyTable={
+		// 搜索接口
+        "/songsearch": {
+            target: "http://songsearch.kugou.com/song_search_v2",
+            changeOrigin: true,
+            pathRewrite: {
+                "^/songsearch": ""
+            }
+        },
+        // 获取歌曲接口
+        "/play": {
+            target: "http://www.kugou.com/yy/index.php",
+            changeOrigin: true,
+            pathRewrite: {
+                "^/play": ""
+            }
+        },
+        // 搜索框关键词搜索接口
+        "/searchtip": {
+            target: "http://searchtip.kugou.com/getSearchTip",
+            changeOrigin: true,
+            pathRewrite: {
+                "^/searchtip": ""
+            }
+        }
+}
+
+// config exress server proxy
+Object.keys(proxyTable).forEach(ctx => {
+    let options = proxyTable[ctx];
+    if(typeof options === 'string') {
+        options = { target: options }
+    }
+    app.use(httpProxyMiddleware(options.filter || ctx, options));
+});
+
+// 检查昵称是否重复
+// io.sockets.sockets 返回所有在线的socket对象集合
+var checkNickname = function(name){
+    for(var k in io.sockets.sockets){
+        if(io.sockets.sockets.hasOwnProperty(k)){
+            if(io.sockets.sockets[k] && io.sockets.sockets[k].nickname == name){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+//在线用户数量
+//console.log(io.eio.clientsCount);
+/*****
+io.eio.clientsCount  // 链接数量
+socket.adapter.rooms // 所有房间
+socket.nsp.connected // 所有链接
+***/
+
+io.on('connection',(socket)=>{
+	//用户登录
+	socket.on('login',(username)=>{
+		if(checkNickname(username)){  //用户名已存在
+			socket.emit('nickname');
+		}else{
+			//socket.id;   唯一
+			socket.nickname=username;
+			socket.emit('loginSuccess');   //登录成功
+			var nums=io.eio.clientsCount;  //在线人数
+			io.sockets.emit('system',username,nums,'login');
+		}
+	});
+
+	//用户断开连接
+	socket.on('disconnect',()=>{
+		if(socket.nickname!= null){
+			var nums=io.eio.clientsCount;  //在线人数
+			socket.broadcast.emit('system',socket.nickname,nums,'logout')
+		}
+	});
+
+	//用户发广播消息
+	socket.on('msg',(msg)=>{
+		//socket.broadcast.emit('newMsg',socket.nickname,msg);
+		//私发消息 _.findWhere(io.sockets.sockets,{nickname:'burt'}).emit();
+		io.sockets.emit('newMsg',socket.nickname,msg);
+	});
+	//用户发广播图片消息
+	socket.on('imgMsg',(addr)=>{
+		io.sockets.emit('newImg',socket.nickname,addr);
+	});
+	//用户发广播的本地图片
+	socket.on('mySelfImg',(addr)=>{
+		socket.broadcast.emit('mySelfImg',addr);
+	});
+	
+});
+
+
+//后台接受的图片是base64编码字符串，要将其转换为图片
+/****
+var imgData = req.body.imgData; //接收前台POST过来的base64
+//过滤data:URL
+var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
+var dataBuffer = new Buffer(base64Data, 'base64');
+fs.writeFile("out.png", dataBuffer, function(err) {
+	if(err){
+	  res.send(err);
+	}else{
+	  res.send("保存成功！");
+	}
+});
+
+****/
